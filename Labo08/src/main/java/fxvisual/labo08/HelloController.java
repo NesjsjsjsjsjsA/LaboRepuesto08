@@ -36,6 +36,8 @@ public class HelloController implements Initializable
     private ToggleGroup Pagos;
     @FXML
     private ToggleGroup Cliente;
+    @FXML
+    private Label lbPreciobasePapas;
 
 
     @Override
@@ -66,10 +68,13 @@ public class HelloController implements Initializable
         alerta.setHeaderText(null);
 
             alerta.setContentText(
-                    "Nombre del cliente : "+txtfieldNombre.getText() +
-                            "\nForma de pago: " + Buttom() +
-                            "\nTipo de cliente: "+Buttom2() +
-                            "\nDescuento: "+Descuento()
+                    "Bienvenido "+txtfieldNombre.getText() +
+                            "\nTipo de cliente: "+Buttom2()+
+                            "\nSubtotal: "+
+                            "\nDescuento: "+Descuento()+
+                            "\nTotal: "+
+                            "\nForma de pago: " + Buttom()
+
             );
 
             alerta.showAndWait();
@@ -87,32 +92,14 @@ public class HelloController implements Initializable
 
     public String Buttom()
     {
-        String name = "none";
-
-        if (rbtmTarjeta.isSelected())
-        {
-            name = "Tarjeta";
-        }
-        if (rbtmEfectivo.isSelected())
-        {
-            name = "Efectivo";
-        }
-        return name;
+        RadioButton selectOption = (RadioButton) Pagos.getSelectedToggle();
+        return selectOption.getText();
     }
 
     public String Buttom2()
     {
-        String name = "none";
-
-        if (rbtmEmpleado.isSelected())
-        {
-            name = "Empleado";
-        }
-        if (rbtmEstudiante.isSelected())
-        {
-            name = "Estudiante";
-        }
-        return name;
+        RadioButton selectOption = (RadioButton) Cliente.getSelectedToggle();
+        return selectOption.getText();
     }
     public double Descuento()
     {
@@ -129,4 +116,7 @@ public class HelloController implements Initializable
 
         return desc;
     }
+
+
+
 }
