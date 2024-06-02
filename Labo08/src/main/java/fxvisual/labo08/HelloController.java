@@ -1,5 +1,7 @@
 package fxvisual.labo08;
 
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
@@ -9,7 +11,11 @@ import java.util.ResourceBundle;
 
 public class HelloController implements Initializable
 {
-
+    private float precioCarne;
+    private float precioPapas;
+    private float precioVegetales;
+    private float precioPollo;
+    private float precioFinal;
     @FXML
     private Spinner<Integer> spnVegetales;
     @FXML
@@ -37,16 +43,24 @@ public class HelloController implements Initializable
     @FXML
     private ToggleGroup Cliente;
     @FXML
-    private Label lbPreciobasePapas;
+    private Label lbPreciofinalpollo;
+    @FXML
+    private Label lbTotalpagar;
+    @FXML
+    private Label lbPreciofinalcarne;
+    @FXML
+    private Label lbPreciofinalpapas;
+    @FXML
+    private Label lbPreciofinalvegtales;
 
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle)
     {
-        SpinnerValueFactory<Integer> valorCarne = new SpinnerValueFactory.IntegerSpinnerValueFactory(0,10);
-        SpinnerValueFactory<Integer> valorPollo = new SpinnerValueFactory.IntegerSpinnerValueFactory(0,10);
-        SpinnerValueFactory<Integer> valorPapa = new SpinnerValueFactory.IntegerSpinnerValueFactory(0,10);
-        SpinnerValueFactory<Integer> valorVegetales = new SpinnerValueFactory.IntegerSpinnerValueFactory(0,10);
+        SpinnerValueFactory<Integer> valorCarne = new SpinnerValueFactory.IntegerSpinnerValueFactory(0,10,0);
+        SpinnerValueFactory<Integer> valorPollo = new SpinnerValueFactory.IntegerSpinnerValueFactory(0,10,0);
+        SpinnerValueFactory<Integer> valorPapa = new SpinnerValueFactory.IntegerSpinnerValueFactory(0,10,0);
+        SpinnerValueFactory<Integer> valorVegetales = new SpinnerValueFactory.IntegerSpinnerValueFactory(0,10,0);
 
         valorCarne.setValue(0);
         valorPollo.setValue(0);
@@ -58,24 +72,102 @@ public class HelloController implements Initializable
         spnPapa.setValueFactory(valorPapa);
         spnVegetales.setValueFactory(valorVegetales);
 
+
+        spnCarne.valueProperty().addListener(new ChangeListener<Integer>(){
+            @Override
+            public void changed(ObservableValue<? extends Integer> observableValue, Integer integer, Integer t1) {
+                precioCarne = spnCarne.getValue()*2.25f;
+                lbPreciofinalcarne.setText("$"+ precioCarne);
+                actualizarTitak();
+            }
+        });
+
+        spnPapa.valueProperty().addListener(new ChangeListener<Integer>(){
+            @Override
+            public void changed(ObservableValue<? extends Integer> observableValue, Integer integer, Integer t1) {
+                precioPapas = spnPapa.getValue()*1.25f;
+                lbPreciofinalpapas.setText("$"+ precioPapas);
+                actualizarTitak();
+            }
+        });
+
+        spnVegetales.valueProperty().addListener(new ChangeListener<Integer>(){
+            @Override
+            public void changed(ObservableValue<? extends Integer> observableValue, Integer integer, Integer t1) {
+                precioVegetales = spnVegetales.getValue()*0.75f;
+                lbPreciofinalvegtales.setText("$"+ precioVegetales);
+                actualizarTitak();
+            }
+        });
+
+        spnPollo.valueProperty().addListener(new ChangeListener<Integer>(){
+            @Override
+            public void changed(ObservableValue<? extends Integer> observableValue, Integer integer, Integer t1) {
+                precioPollo = spnPollo.getValue()*1.75f;
+                lbPreciofinalpollo.setText("$"+ precioPollo);
+                actualizarTitak();
+            }
+        });
+
+
+
     }
 
-    public void AvisoMensajeComprar()
+    public void actualizarTitak()
+    {
+        precioFinal = precioCarne + precioPapas;
+        lbTotalpagar.setText("$"+precioFinal);
+    }
+
+    public void VentanaEmergente()
+    {
+        if (txtfieldNombre.getText().length() < 7)
+        {
+            AvisoError();
+        }
+        else if (TotalPago()== 0)
+        {
+            AvisoWarging();
+        }
+        else
+        {
+            AvisoInformation();
+        }
+    }
+
+    public double TotalPago()
+    {
+        return spnVegetales.getValue()+spnPollo.getValue()+spnCarne.getValue()+spnPapa.getValue();
+    }
+
+    public void AvisoWarging()
+    {
+
+        Alert alert = new Alert(Alert.AlertType.WARNING);
+        alert.setTitle("Advertencia");
+        alert.setHeaderText(null);
+        alert.setContentText("Debes de seleccionar algo :p");
+        alert.showAndWait();
+    }
+
+    public void AvisoError()
+    {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle("Error");
+        alert.setHeaderText(null);
+        alert.setContentText("El nombre no cumple con lo establecido");
+        alert.showAndWait();
+    }
+
+
+    public void AvisoInformation()
     {
         Alert alerta = new Alert(Alert.AlertType.INFORMATION);
 
         alerta.setTitle("Informacion");
         alerta.setHeaderText(null);
 
-            alerta.setContentText(
-                    "Bienvenido "+txtfieldNombre.getText() +
-                            "\nTipo de cliente: "+Buttom2()+
-                            "\nSubtotal: "+
-                            "\nDescuento: "+Descuento()+
-                            "\nTotal: "+
-                            "\nForma de pago: " + Buttom()
-
-            );
+            alerta.setContentText("Bienvenido "+txtfieldNombre.getText());
 
             alerta.showAndWait();
 
@@ -88,6 +180,12 @@ public class HelloController implements Initializable
         rbtmEstudiante.setSelected(false);
         rbtmEmpleado.setSelected(false);
         rbtmTarjeta.setSelected(false);
+
+        spnCarne.getValueFactory().setValue(0);
+        spnPapa.getValueFactory().setValue(0);
+        spnPollo.getValueFactory().setValue(0);
+        spnVegetales.getValueFactory().setValue(0);
+
     }
 
     public String Buttom()
@@ -101,22 +199,5 @@ public class HelloController implements Initializable
         RadioButton selectOption = (RadioButton) Cliente.getSelectedToggle();
         return selectOption.getText();
     }
-    public double Descuento()
-    {
-        double desc = 0;
-
-        if (rbtmEmpleado.isSelected())
-        {
-            desc = 0.05;
-        }
-        if (rbtmEstudiante.isSelected())
-        {
-            desc = 0.10;
-        }
-
-        return desc;
-    }
-
-
 
 }
