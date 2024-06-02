@@ -110,7 +110,7 @@
                </font></Label>
             <Label layoutX="93.0" layoutY="27.0" text="Total: " />
             <Label fx:id="lbTotalpagar" layoutX="131.0" layoutY="27.0" text="\$0.00" />
-            <Button fx:id="btmLimpiar" layoutX="71.0" layoutY="47.0" mnemonicParsing="false" onAction="#LimpiarBarra" style="-fx-background-color: FF8000; -fx-background-radius: 10;" text="Limpiar" textFill="WHITE" />
+            <Button fx:id="btmLimpiar" layoutX="71.0" layoutY="47.0" mnemonicParsing="false" onAction="#Cleaning" style="-fx-background-color: FF8000; -fx-background-radius: 10;" text="Limpiar" textFill="WHITE" />
             <Button fx:id="btmComprar" layoutX="132.0" layoutY="47.0" mnemonicParsing="false" onAction="#VentanaEmergente" style="-fx-background-color: FF8000; -fx-background-radius: 10;" text="Comprar" textFill="WHITE" />
          </children>
       </Pane>

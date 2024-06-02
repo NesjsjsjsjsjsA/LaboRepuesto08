@@ -16,6 +16,7 @@ public class HelloController implements Initializable
     private float precioVegetales;
     private float precioPollo;
     private float precioFinal;
+
     @FXML
     private Spinner<Integer> spnVegetales;
     @FXML
@@ -26,10 +27,6 @@ public class HelloController implements Initializable
     private Spinner<Integer> spnPapa;
     @FXML
     private TextField txtfieldNombre;
-    @FXML
-    private Button btmComprar;
-    @FXML
-    private Button btmLimpiar;
     @FXML
     private RadioButton rbtmTarjeta;
     @FXML
@@ -74,11 +71,13 @@ public class HelloController implements Initializable
 
 
         spnCarne.valueProperty().addListener(new ChangeListener<Integer>(){
+
             @Override
             public void changed(ObservableValue<? extends Integer> observableValue, Integer integer, Integer t1) {
-                precioCarne = spnCarne.getValue()*2.25f;
-                lbPreciofinalcarne.setText("$"+ precioCarne);
-                actualizarTitak();
+
+                    precioCarne = spnCarne.getValue()*2.25f;
+                    lbPreciofinalcarne.setText("$"+ precioCarne);
+                    updateFinalPrice();
             }
         });
 
@@ -87,7 +86,7 @@ public class HelloController implements Initializable
             public void changed(ObservableValue<? extends Integer> observableValue, Integer integer, Integer t1) {
                 precioPapas = spnPapa.getValue()*1.25f;
                 lbPreciofinalpapas.setText("$"+ precioPapas);
-                actualizarTitak();
+                updateFinalPrice();
             }
         });
 
@@ -96,7 +95,7 @@ public class HelloController implements Initializable
             public void changed(ObservableValue<? extends Integer> observableValue, Integer integer, Integer t1) {
                 precioVegetales = spnVegetales.getValue()*0.75f;
                 lbPreciofinalvegtales.setText("$"+ precioVegetales);
-                actualizarTitak();
+                updateFinalPrice();
             }
         });
 
@@ -105,80 +104,43 @@ public class HelloController implements Initializable
             public void changed(ObservableValue<? extends Integer> observableValue, Integer integer, Integer t1) {
                 precioPollo = spnPollo.getValue()*1.75f;
                 lbPreciofinalpollo.setText("$"+ precioPollo);
-                actualizarTitak();
+                updateFinalPrice();
             }
+
         });
-
-
-
     }
 
-    public void actualizarTitak()
+    //Metodos y funciones para actualizar datos
+    
+    public void updateFinalPrice()
     {
-        precioFinal = precioCarne + precioPapas;
+        precioFinal = precioCarne + precioPapas + precioPollo + precioVegetales;
         lbTotalpagar.setText("$"+precioFinal);
     }
 
-    public void VentanaEmergente()
+    public float finalPriceDisct()
     {
-        if (txtfieldNombre.getText().length() < 7)
+        float Prescdesc = 0;
+
+        if (rbtmEstudiante.isSelected())
         {
-            AvisoError();
+            Prescdesc = precioFinal * 0.70f;
         }
-        else if (TotalPago()== 0)
+        else if (rbtmEmpleado.isSelected())
         {
-            AvisoWarging();
+            Prescdesc = precioFinal * 0.80f;
         }
-        else
-        {
-            AvisoInformation();
-        }
+        return Prescdesc;
     }
 
-    public double TotalPago()
-    {
-        return spnVegetales.getValue()+spnPollo.getValue()+spnCarne.getValue()+spnPapa.getValue();
-    }
-
-    public void AvisoWarging()
-    {
-
-        Alert alert = new Alert(Alert.AlertType.WARNING);
-        alert.setTitle("Advertencia");
-        alert.setHeaderText(null);
-        alert.setContentText("Debes de seleccionar algo :p");
-        alert.showAndWait();
-    }
-
-    public void AvisoError()
-    {
-        Alert alert = new Alert(Alert.AlertType.ERROR);
-        alert.setTitle("Error");
-        alert.setHeaderText(null);
-        alert.setContentText("El nombre no cumple con lo establecido");
-        alert.showAndWait();
-    }
-
-
-    public void AvisoInformation()
-    {
-        Alert alerta = new Alert(Alert.AlertType.INFORMATION);
-
-        alerta.setTitle("Informacion");
-        alerta.setHeaderText(null);
-
-            alerta.setContentText("Bienvenido "+txtfieldNombre.getText());
-
-            alerta.showAndWait();
-
-    }
-
-    public void LimpiarBarra()
+    public void Cleaning()
     {
         txtfieldNombre.setText(" ");
-        rbtmEfectivo.setSelected(false);
+
         rbtmEstudiante.setSelected(false);
         rbtmEmpleado.setSelected(false);
+
+        rbtmEfectivo.setSelected(false);
         rbtmTarjeta.setSelected(false);
 
         spnCarne.getValueFactory().setValue(0);
@@ -187,6 +149,8 @@ public class HelloController implements Initializable
         spnVegetales.getValueFactory().setValue(0);
 
     }
+
+    //Relacionado con los botones...
 
     public String Buttom()
     {
@@ -198,6 +162,63 @@ public class HelloController implements Initializable
     {
         RadioButton selectOption = (RadioButton) Cliente.getSelectedToggle();
         return selectOption.getText();
+    }
+
+    //Todo lo relacionado con las ventanas
+
+    public void VentanaEmergente()
+    {
+        if (txtfieldNombre.getText().length() < 7)
+        {
+            AvisoError();
+        }
+        else if (!(rbtmEmpleado.isSelected() || rbtmEstudiante.isSelected()) || !(rbtmTarjeta.isSelected() || rbtmEfectivo.isSelected()) || (precioFinal == 0))
+        {
+            AvisoWarging();
+        }
+        else
+        {
+            float precioFDesc = finalPriceDisct();
+            AvisoInformation(precioFDesc);
+        }
+    }
+
+    public void AvisoWarging()
+    {
+
+        Alert alert = new Alert(Alert.AlertType.WARNING);
+        alert.setTitle("Ten cuidado...");
+        alert.setHeaderText(null);
+        alert.setContentText("Debes de seleccionar algo :p");
+        alert.showAndWait();
+    }
+
+    public void AvisoError()
+    {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle("Oh oh ALGO SALIO MAL");
+        alert.setHeaderText(null);
+        alert.setContentText("El nombre no cumple con lo establecido");
+        alert.showAndWait();
+    }
+
+    public void AvisoInformation(float preci)
+    {
+        Alert alerta = new Alert(Alert.AlertType.INFORMATION);
+
+        alerta.setTitle("Gracias por tu compra");
+        alerta.setHeaderText(null);
+
+            alerta.setContentText(
+                    "Bienvenido "+txtfieldNombre.getText()
+                    + "\nSu total es de: $"+ preci
+                    + "\nTipo de cliente: "+ Buttom2()
+                    + "\nForma de pago: " + Buttom()
+
+            );
+
+            alerta.showAndWait();
+
     }
 
 }
