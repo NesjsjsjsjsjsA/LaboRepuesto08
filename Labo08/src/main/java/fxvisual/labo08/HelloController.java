@@ -5,18 +5,26 @@ import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
+import javafx.scene.media.Media;
+import javafx.scene.media.MediaPlayer;
 
 import java.net.URL;
 import java.util.ResourceBundle;
 
 public class HelloController implements Initializable
 {
-    private float precioCarne;
-    private float precioPapas;
-    private float precioVegetales;
-    private float precioPollo;
-    private float precioFinal;
+    private double precioCarne;
+    private double precioPapas;
+    private double precioVegetales;
+    private double precioPollo;
+    private double precioFinal;
 
+    @FXML
+    private MediaPlayer mediaError;
+    @FXML
+    private MediaPlayer mediaWarning;
+    @FXML
+    private MediaPlayer mediaInformation;
     @FXML
     private Spinner<Integer> spnVegetales;
     @FXML
@@ -54,6 +62,20 @@ public class HelloController implements Initializable
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle)
     {
+
+        URL mediaUrl = getClass().getResource("/fxvisual/labo08/Sounds/error.mp3");
+        Media mediaError = new Media(mediaUrl.toExternalForm());
+        this.mediaError = new MediaPlayer(mediaError);
+
+        URL media2Url = getClass().getResource("/fxvisual/labo08/Sounds/warning.mp3");
+        Media mediaWarning = new Media(media2Url.toExternalForm());
+        this.mediaWarning = new MediaPlayer(mediaWarning);
+
+        URL media3url = getClass().getResource("/fxvisual/labo08/Sounds/information.mp3");
+        Media mediaInformation = new Media(media3url.toExternalForm());
+        this.mediaInformation = new MediaPlayer(mediaInformation);
+
+
         SpinnerValueFactory<Integer> valorCarne = new SpinnerValueFactory.IntegerSpinnerValueFactory(0,10,0);
         SpinnerValueFactory<Integer> valorPollo = new SpinnerValueFactory.IntegerSpinnerValueFactory(0,10,0);
         SpinnerValueFactory<Integer> valorPapa = new SpinnerValueFactory.IntegerSpinnerValueFactory(0,10,0);
@@ -68,7 +90,6 @@ public class HelloController implements Initializable
         spnPollo.setValueFactory(valorPollo);
         spnPapa.setValueFactory(valorPapa);
         spnVegetales.setValueFactory(valorVegetales);
-
 
         spnCarne.valueProperty().addListener(new ChangeListener<Integer>(){
 
@@ -106,7 +127,6 @@ public class HelloController implements Initializable
                 lbPreciofinalpollo.setText("$"+ precioPollo);
                 updateFinalPrice();
             }
-
         });
     }
 
@@ -118,23 +138,24 @@ public class HelloController implements Initializable
         lbTotalpagar.setText("$"+precioFinal);
     }
 
-    public float finalPriceDisct()
+    public double finalPriceDisct()
     {
-        float Prescdesc = 0;
+        double Prescdesc = 0;
+        double scale = Math.pow(10,2);
 
-        if (rbtmEstudiante.isSelected())
+        if (rbtmEmpleado.isSelected())
         {
-            Prescdesc = precioFinal * 0.70f;
+            Prescdesc = precioFinal*0.10f;
         }
-        else if (rbtmEmpleado.isSelected())
-        {
-            Prescdesc = precioFinal * 0.80f;
-        }
-        return Prescdesc;
+        return Math.ceil(Prescdesc*scale)/scale;
     }
 
     public void Cleaning()
     {
+
+        InformationStop();
+        InformationPlay();
+
         txtfieldNombre.setText(" ");
 
         rbtmEstudiante.setSelected(false);
@@ -150,7 +171,40 @@ public class HelloController implements Initializable
 
     }
 
-    //Relacionado con los botones...
+    //Relacionado con los sonidos
+
+    @FXML
+    private void ErrorPlay()
+    {
+        mediaError.play();
+    }
+    @FXML
+    private void WarningPlay()
+    {
+        mediaWarning.play();
+    }
+    @FXML
+    private void InformationPlay()
+    {
+        mediaInformation.play();
+    }
+    @FXML
+    private void ErrorStop()
+    {
+        mediaError.stop();
+    }
+    @FXML
+    private void WarningStop()
+    {
+        mediaWarning.stop();
+    }
+    @FXML
+    private void InformationStop()
+    {
+        mediaInformation.stop();
+    }
+
+    //Relacionado con los botones
 
     public String Buttom()
     {
@@ -163,6 +217,11 @@ public class HelloController implements Initializable
         RadioButton selectOption = (RadioButton) Cliente.getSelectedToggle();
         return selectOption.getText();
     }
+    public void ActionSound()
+    {
+        InformationStop();
+        InformationPlay();
+    }
 
     //Todo lo relacionado con las ventanas
 
@@ -170,26 +229,31 @@ public class HelloController implements Initializable
     {
         if (txtfieldNombre.getText().length() < 7)
         {
-            AvisoError();
+            WarningStop();
+            WarningPlay();
+            AvisoWarging();
         }
         else if (!(rbtmEmpleado.isSelected() || rbtmEstudiante.isSelected()) || !(rbtmTarjeta.isSelected() || rbtmEfectivo.isSelected()) || (precioFinal == 0))
         {
-            AvisoWarging();
+            ErrorStop();
+            ErrorPlay();
+            AvisoError();
         }
         else
         {
-            float precioFDesc = finalPriceDisct();
+            double precioFDesc = finalPriceDisct();
+            InformationStop();
+            InformationPlay();
             AvisoInformation(precioFDesc);
         }
     }
 
     public void AvisoWarging()
     {
-
         Alert alert = new Alert(Alert.AlertType.WARNING);
         alert.setTitle("Ten cuidado...");
         alert.setHeaderText(null);
-        alert.setContentText("Debes de seleccionar algo :p");
+        alert.setContentText("Debe digitar bien su nombre...");
         alert.showAndWait();
     }
 
@@ -198,11 +262,11 @@ public class HelloController implements Initializable
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setTitle("Oh oh ALGO SALIO MAL");
         alert.setHeaderText(null);
-        alert.setContentText("El nombre no cumple con lo establecido");
+        alert.setContentText("Debes de seleccionar algo :P...");
         alert.showAndWait();
     }
 
-    public void AvisoInformation(float preci)
+    public void AvisoInformation(double preci)
     {
         Alert alerta = new Alert(Alert.AlertType.INFORMATION);
 
@@ -211,12 +275,14 @@ public class HelloController implements Initializable
 
             alerta.setContentText(
                     "Bienvenido "+txtfieldNombre.getText()
-                    + "\nSu total es de: $"+ preci
-                    + "\nTipo de cliente: "+ Buttom2()
-                    + "\nForma de pago: " + Buttom()
+                    +"\nSubtotal : $ "+precioFinal
+                    +"\nDescuento: $"+ preci
+                    +"\nTotal de: $" +(precioFinal-preci)
+                    +"\nTipo de cliente: "+ Buttom2()
+                    +"\nForma de pago: " + Buttom()
+                    +"\n Gracias por tu compra!"
 
             );
-
             alerta.showAndWait();
 
     }
